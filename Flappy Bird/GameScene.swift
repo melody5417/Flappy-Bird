@@ -25,6 +25,8 @@ class GameScene: SKScene {
     let k底部障碍最小乘数: CGFloat = 0.1
     let k底部障碍最大乘数: CGFloat = 0.6
     let k缺口乘数: CGFloat = 3.5
+    let k首次生成障碍延迟: TimeInterval = 1.75
+    let k每次重新障碍延迟: TimeInterval = 1.5
     
     var 速度 = CGPoint.zero
     
@@ -50,7 +52,7 @@ class GameScene: SKScene {
         设置背景()
         设置前景()
         设置主角()
-        生成障碍()
+        无限重新障碍()
     }
     
     // MARK: 设置的相关方法
@@ -128,6 +130,17 @@ class GameScene: SKScene {
             ])
         顶部障碍.run(移动的动作队列)
         底部障碍.run(移动的动作队列)
+    }
+    
+    func 无限重新障碍 () {
+        let 首次延迟 = SKAction.wait(forDuration: k首次生成障碍延迟)
+        let 重生障碍 = SKAction.run(生成障碍)
+        let 每次重生间隔 = SKAction.wait(forDuration: k每次重新障碍延迟)
+        let 重生的动作队列 = SKAction.sequence([重生障碍, 每次重生间隔])
+        let 无限重生 = SKAction.repeatForever(重生的动作队列)
+        let 总的动作队列 = SKAction.sequence([首次延迟, 无限重生])
+        
+        run(总的动作队列)
     }
     
     // MARK: 更新
