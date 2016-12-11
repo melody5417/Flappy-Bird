@@ -24,6 +24,7 @@ class GameScene: SKScene {
     let k上冲速度: CGFloat = 200
     let k底部障碍最小乘数: CGFloat = 0.1
     let k底部障碍最大乘数: CGFloat = 0.6
+    let k缺口乘数: CGFloat = 3.5
     
     var 速度 = CGPoint.zero
     
@@ -110,10 +111,12 @@ class GameScene: SKScene {
         let Y坐标最大值 = (游戏区域起始点 - 底部障碍.size.height/2) + 游戏区域的高度 * k底部障碍最大乘数
         
         底部障碍.position = CGPoint(x: 起始X坐标, y: CGFloat.random(min: Y坐标最小值, max: Y坐标最大值))
-        
         游戏世界.addChild(底部障碍)
         
-        
+        let 顶部障碍 = 创建障碍物(图片名: "CactusBottom")
+        顶部障碍.zRotation = CGFloat(180).degreesToRadians()
+        顶部障碍.position = CGPoint(x: 起始X坐标, y: 底部障碍.position.y + 底部障碍.size.height/2 + 底部障碍.size.height/2 + 主角.size.height * k缺口乘数)
+        游戏世界.addChild(顶部障碍)
     }
     
     // MARK: 更新
