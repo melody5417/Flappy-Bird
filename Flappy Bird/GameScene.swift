@@ -19,7 +19,7 @@ class GameScene: SKScene {
     
     // k作为常量开头
     let k前景地面数 = 2
-    let k地面移动速度 = -150.0
+    let k地面移动速度: CGFloat = -150.0
     let k重力: CGFloat = -500.0
     let k上冲速度: CGFloat = 200
     let k底部障碍最小乘数: CGFloat = 0.1
@@ -105,7 +105,8 @@ class GameScene: SKScene {
     
     func 生成障碍() {
         let 底部障碍 = 创建障碍物(图片名: "CactusBottom")
-        let 起始X坐标 = size.width / 2
+        // 将底部障碍移到右边屏幕外面
+        let 起始X坐标 = size.width + 底部障碍.size.width/2
         
         let Y坐标最小值 = (游戏区域起始点 - 底部障碍.size.height/2) + 游戏区域的高度 * k底部障碍最小乘数
         let Y坐标最大值 = (游戏区域起始点 - 底部障碍.size.height/2) + 游戏区域的高度 * k底部障碍最大乘数
@@ -117,6 +118,16 @@ class GameScene: SKScene {
         顶部障碍.zRotation = CGFloat(180).degreesToRadians()
         顶部障碍.position = CGPoint(x: 起始X坐标, y: 底部障碍.position.y + 底部障碍.size.height/2 + 底部障碍.size.height/2 + 主角.size.height * k缺口乘数)
         游戏世界.addChild(顶部障碍)
+        
+        let X轴移动距离 = -(size.width + 底部障碍.size.width)
+        let 移动持续时间 = X轴移动距离 / k地面移动速度
+        
+        let 移动的动作队列 = SKAction.sequence([
+                SKAction.moveBy(x: X轴移动距离, y: 0, duration: TimeInterval(移动持续时间)),
+                SKAction.removeFromParent()
+            ])
+        顶部障碍.run(移动的动作队列)
+        底部障碍.run(移动的动作队列)
     }
     
     // MARK: 更新
