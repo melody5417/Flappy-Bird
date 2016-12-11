@@ -15,6 +15,13 @@ enum 图层: CGFloat {
     case 游戏角色
 }
 
+enum 物理层 {
+    static let 无: UInt32 =              0
+    static let 游戏角色: UInt32 =       0b1 // 1
+    static let 障碍物: UInt32 =        0b10 // 2
+    static let 地面: UInt32 =         0b100 // 4
+}
+
 class GameScene: SKScene {
     
     // k作为常量开头
@@ -49,6 +56,10 @@ class GameScene: SKScene {
     let 得分的音效 = SKAction.playSoundFileNamed("coin.wav", waitForCompletion: false)
     
     override func didMove(to view: SKView) {
+        
+        // 关掉重力
+        physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+        
         addChild(游戏世界)
         设置背景()
         设置前景()
@@ -68,11 +79,49 @@ class GameScene: SKScene {
         
         游戏区域起始点 = size.height - 背景.size.height
         游戏区域的高度 = 背景.size.height
+        
+        let 左下 = CGPoint(x: 0, y: 游戏区域起始点)
+        let 右下 = CGPoint(x: size.width, y: 游戏区域起始点)
+        
+        self.physicsBody = SKPhysicsBody(edgeFrom: 左下, to: 右下)
+        self.physicsBody?.categoryBitMask = 物理层.地面
+        self.physicsBody?.collisionBitMask = 0
+        self.physicsBody?.contactTestBitMask = 物理层.游戏角色
+        
     }
     
     func 设置主角() {
         主角.position = CGPoint(x: size.width * 0.2, y: 游戏区域的高度 * 0.4 + 游戏区域起始点)
         主角.zPosition = 图层.游戏角色.rawValue
+        
+        let offsetX = 主角.size.width * 主角.anchorPoint.x
+        let offsetY = 主角.size.height * 主角.anchorPoint.y
+        
+        let path = CGMutablePath()
+        
+        path.move(to: CGPoint(x: 4 - offsetX, y: 9 - offsetY))
+        path.addLine(to: CGPoint(x: 8 - offsetX, y: 11 - offsetY))
+        path.addLine(to: CGPoint(x: 11 - offsetX, y: 13 - offsetY))
+        path.addLine(to: CGPoint(x: 19 - offsetX, y: 14 - offsetY))
+        path.addLine(to: CGPoint(x: 19 - offsetX, y: 5 - offsetY))
+        path.addLine(to: CGPoint(x: 17 - offsetX, y: 2 - offsetY))
+        path.addLine(to: CGPoint(x: 14 - offsetX, y: 1 - offsetY))
+        path.addLine(to: CGPoint(x: 12 - offsetX, y: 1 - offsetY))
+        path.addLine(to: CGPoint(x: 10 - offsetX, y: 0 - offsetY))
+        path.addLine(to: CGPoint(x: 4 - offsetX, y: 0 - offsetY))
+        path.addLine(to: CGPoint(x: 4 - offsetX, y: 2 - offsetY))
+        path.addLine(to: CGPoint(x: 1 - offsetX, y: 3 - offsetY))
+        path.addLine(to: CGPoint(x: 2 - offsetX, y: 1 - offsetY))
+        path.addLine(to: CGPoint(x: 6 - offsetX, y: 1 - offsetY))
+        path.addLine(to: CGPoint(x: 2 - offsetX, y: 6 - offsetY))
+        
+        path.closeSubpath()
+        
+        主角.physicsBody = SKPhysicsBody(polygonFrom: path)
+        主角.physicsBody?.categoryBitMask = 物理层.游戏角色
+        主角.physicsBody?.collisionBitMask = 0
+        主角.physicsBody?.contactTestBitMask = 物理层.障碍物 | 物理层.地面
+        
         游戏世界.addChild(主角)
     }
     
@@ -116,6 +165,26 @@ class GameScene: SKScene {
     func 创建障碍物(图片名: String) -> SKSpriteNode {
         let 障碍物 = SKSpriteNode(imageNamed: 图片名)
         障碍物.zPosition = 图层.障碍物.rawValue
+        
+        let offsetX = 障碍物.size.width * 障碍物.anchorPoint.x
+        let offsetY = 障碍物.size.height * 障碍物.anchorPoint.y
+        
+        let path = CGMutablePath()
+        
+        path.move(to: CGPoint(x: 27 - offsetX, y: 315 - offsetY))
+        path.addLine(to: CGPoint(x: 48 - offsetX, y: 310 - offsetY))
+        path.addLine(to: CGPoint(x: 51 - offsetX, y: 268 - offsetY))
+        path.addLine(to: CGPoint(x: 49 - offsetX, y: 0 - offsetY))
+        path.addLine(to: CGPoint(x: 3 - offsetX, y: 0 - offsetY))
+        path.addLine(to: CGPoint(x: 6 - offsetX, y: 310 - offsetY))
+
+        path.closeSubpath()
+        
+        障碍物.physicsBody = SKPhysicsBody(polygonFrom: path)
+        障碍物.physicsBody?.categoryBitMask = 物理层.障碍物
+        障碍物.physicsBody?.collisionBitMask = 0
+        障碍物.physicsBody?.contactTestBitMask = 物理层.游戏角色
+        
         return 障碍物
     }
     
