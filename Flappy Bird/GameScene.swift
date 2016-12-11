@@ -35,6 +35,7 @@ class GameScene: SKScene {
     var 游戏区域起始点: CGFloat = 0
     var 游戏区域的高度: CGFloat = 0
     let 主角 = SKSpriteNode(imageNamed: "Bird0")
+    let 帽子 = SKSpriteNode(imageNamed: "Sombrero")
     var 上一次更新时间: TimeInterval = 0
     var dt: TimeInterval = 0
     
@@ -52,6 +53,7 @@ class GameScene: SKScene {
         设置背景()
         设置前景()
         设置主角()
+        设置帽子()
         无限重新障碍()
     }
     
@@ -86,17 +88,29 @@ class GameScene: SKScene {
         }
     }
     
+    func 设置帽子() {
+        帽子.position = CGPoint(x: 31 - 帽子.size.width/2, y: 29 - 帽子.size.height/2)
+        主角.addChild(帽子)
+    }
+    
     // MARK: 游戏流程
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        // 播放音效
+        run(拍打的音效)
+        
+        // 增加上冲速度
         主角飞一下()
+        
+        // 移动帽子
+        let 向上移动 = SKAction.moveBy(x: 0, y: 12, duration: 0.15)
+        向上移动.timingMode = .easeInEaseOut
+        let 向下移动 = 向上移动.reversed()
+        帽子.run(SKAction.sequence([向上移动, 向下移动]))
     }
     
     func 主角飞一下() {
         速度 = CGPoint(x: 0, y: k上冲速度)
-        
-        // 播放音效
-        run(拍打的音效)
     }
     
     func 创建障碍物(图片名: String) -> SKSpriteNode {
