@@ -10,18 +10,21 @@ import SpriteKit
 
 enum 图层: CGFloat {
     case 背景
+    case 障碍物
     case 前景
     case 游戏角色
 }
 
 class GameScene: SKScene {
     
+    // k作为常量开头
     let k前景地面数 = 2
     let k地面移动速度 = -150.0
-    
-    // k作为常量开头
     let k重力: CGFloat = -500.0
     let k上冲速度: CGFloat = 200
+    let k底部障碍最小乘数: CGFloat = 0.1
+    let k底部障碍最大乘数: CGFloat = 0.6
+    
     var 速度 = CGPoint.zero
     
     // 作为容纳整个游戏的容器
@@ -46,6 +49,7 @@ class GameScene: SKScene {
         设置背景()
         设置前景()
         设置主角()
+        生成障碍()
     }
     
     // MARK: 设置的相关方法
@@ -90,6 +94,26 @@ class GameScene: SKScene {
         
         // 播放音效
         run(拍打的音效)
+    }
+    
+    func 创建障碍物(图片名: String) -> SKSpriteNode {
+        let 障碍物 = SKSpriteNode(imageNamed: 图片名)
+        障碍物.zPosition = 图层.障碍物.rawValue
+        return 障碍物
+    }
+    
+    func 生成障碍() {
+        let 底部障碍 = 创建障碍物(图片名: "CactusBottom")
+        let 起始X坐标 = size.width / 2
+        
+        let Y坐标最小值 = (游戏区域起始点 - 底部障碍.size.height/2) + 游戏区域的高度 * k底部障碍最小乘数
+        let Y坐标最大值 = (游戏区域起始点 - 底部障碍.size.height/2) + 游戏区域的高度 * k底部障碍最大乘数
+        
+        底部障碍.position = CGPoint(x: 起始X坐标, y: CGFloat.random(min: Y坐标最小值, max: Y坐标最大值))
+        
+        游戏世界.addChild(底部障碍)
+        
+        
     }
     
     // MARK: 更新
