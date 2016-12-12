@@ -4,7 +4,7 @@
 //
 //  Created by Yiqi Wang on 2016/12/7.
 //  Copyright © 2016年 Melody5417. All rights reserved.
-//
+//  多边形工具 - http://stackoverflow.com/questions/19040144
 
 import SpriteKit
 
@@ -22,7 +22,7 @@ enum 物理层 {
     static let 地面: UInt32 =         0b100 // 4
 }
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     
     // k作为常量开头
     let k前景地面数 = 2
@@ -36,6 +36,8 @@ class GameScene: SKScene {
     let k每次重新障碍延迟: TimeInterval = 1.5
     
     var 速度 = CGPoint.zero
+    var 撞击了地面 = false
+    var 撞击了障碍物 = false
     
     // 作为容纳整个游戏的容器
     let 游戏世界 = SKNode()
@@ -59,6 +61,9 @@ class GameScene: SKScene {
         
         // 关掉重力
         physicsWorld.gravity = CGVector(dx: 0, dy: 0)
+        
+        // 设置碰撞代理
+        physicsWorld.contactDelegate = self
         
         addChild(游戏世界)
         设置背景()
@@ -266,6 +271,20 @@ class GameScene: SKScene {
                 }
             }
         })
+    }
+    
+    // MARK: 物理引擎
+    
+    func didBegin(_ 碰撞双方: SKPhysicsContact) {
+        let 被撞对象 = 碰撞双方.bodyA.categoryBitMask ==
+            物理层.游戏角色 ? 碰撞双方.bodyB : 碰撞双方.bodyA
+        
+        if 被撞对象.categoryBitMask == 物理层.地面 {
+            撞击了地面 = true
+        }
+        if 被撞对象.categoryBitMask == 物理层.障碍物 {
+            撞击了障碍物 = true
+        }
     }
     
 }
